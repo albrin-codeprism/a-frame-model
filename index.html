@@ -1,0 +1,67 @@
+<html>
+
+</html>
+
+<head>
+    <title>A Frame </title>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+</head>
+
+<body>
+    <script type="text/javascript">
+        AFRAME.registerComponent('motion-control-component', {
+            schema: {
+                rotationSpeed: { default: 2.5 },
+                zoomSpeed: { default: .005 },
+            },
+            init: function () {
+                this.ifMouseDown = false;
+                this.x_cord = 0;
+                this.y_cord = 0;
+                this.scale = 1;
+                this.el.object3D.position.set(0, 1.7, -2);
+                document.addEventListener('mousedown', this.handleMouseDown.bind(this));
+                document.addEventListener('mouseup', this.handleMouseUp.bind(this));
+                document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+                document.addEventListener('wheel', this.handleMouseWheel.bind(this));
+            },
+            handleMouseDown: function (event) {
+                this.ifMouseDown = true;
+                this.x_cord = event.clientX;
+                this.y_cord = event.clientY;
+            },
+            handleMouseUp: function () {
+                this.ifMouseDown = false;
+            },
+            handleMouseMove: function (event) {
+                if (this.ifMouseDown) {
+                    var deltaX = event.clientX - this.x_cord;
+                    var deltaY = event.clientY - this.y_cord;
+
+                    this.el.object3D.rotateY(deltaX * this.data.rotationSpeed / 300);
+                    this.el.object3D.rotateX(deltaY * this.data.rotationSpeed / 300);
+                    // this.el.object3D.rotateZ(deltaY * this.data.rotationSpeed / 300);
+
+                    this.x_cord = event.clientX;
+                    this.y_cord = event.clientY;
+                }
+            },
+            handleMouseWheel: function (event) {
+                this.scale += event.deltaY * -this.data.zoomSpeed;
+                this.scale = Math.min(Math.max(.1, this.scale));
+                this.el.object3D.scale.set(this.scale, this.scale, this.scale);
+            }
+        });
+    </script>
+    <a-scene background="color: #ededed" xr-mode-ui="enabled: true">
+        <a-assets>
+            <a-asset-item id="element" src="/scene.gltf"></a-asset-item>
+        </a-assets>
+        <a-entity gltf-model="#element" position="0 0 -2" scale=".6 .6 .6" motion-control-component></a-entity>
+        <a-camera look-controls="enabled: false" wasd-controls=" enabled: false">
+        </a-camera>
+    </a-scene>
+
+</body>
+
+</html>
